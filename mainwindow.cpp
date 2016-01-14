@@ -94,10 +94,22 @@ bool MainWindow::eventFilter(QObject * /*obj*/, QEvent *event)
         if (rb.width() > 10 && rb.height() > 10) {
             selectionTime = {topSample, bottomSample};
             selectionFreq = {left, right};
+
+            int sampleRate = dock->sampleRate->text().toInt();
+            statusBar()->showMessage(QString("Freq: %1Hz to %2Hz (%3Hz) Time: %4s to %5s (%6s / %7Hz)").arg(
+                                        QString::number(left * sampleRate, 'g', 4),
+                                        QString::number(right * sampleRate, 'g', 4),
+                                        QString::number((right - left) * sampleRate, 'g', 4),
+                                        QString::number((float)topSample / sampleRate, 'g', 4),
+                                        QString::number((float)bottomSample / sampleRate, 'g', 4),
+                                        QString::number((float)(bottomSample - topSample) / sampleRate, 'g', 4),
+                                        QString::number((float)sampleRate / (bottomSample - topSample), 'g', 4))
+            );
             emit selectionChanged(selectionTime, selectionFreq);
         } else {
             rubberBand->hide();
             rubberBand->clearMask();
+            statusBar()->clearMessage();
             emit selectionCleared();
         }
         return true;
